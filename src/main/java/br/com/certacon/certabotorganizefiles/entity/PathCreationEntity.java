@@ -1,4 +1,4 @@
-package entity;
+package br.com.certacon.certabotorganizefiles.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
@@ -28,9 +28,6 @@ public class PathCreationEntity {
     @Column(name = "raiz")
     private String root;
 
-    @Column(name = "funcao_folder")
-    private String function;
-
     @Column(name = "ip_servidor")
     private String ipServer;
 
@@ -39,4 +36,7 @@ public class PathCreationEntity {
 
     @Column(name = "year")
     private String year;
+
+    @Column(name = "path")
+    private String path;
 }
