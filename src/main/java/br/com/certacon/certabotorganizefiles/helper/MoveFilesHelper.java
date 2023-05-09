@@ -43,17 +43,18 @@ public class MoveFilesHelper {
                 + File.separator + components.getCnpj()
                 + File.separator + components.getYear()
                 + File.separator + secundaryFolder
-                + File.separator + obrigacaoAcessoria);
+                + File.separator + obrigacaoAcessoria
+        );
         return finalPath;
     }
 
-    public Path pathCreatorForToOrganize(PathCreationEntity components, FileFoldersFunction function) {
+    public Path pathCreatorForToOrganize(PathCreationEntity components) {
         Path finalPath = Path.of(components.getRoot()
-                + File.separator + function
+                + File.separator + FileFoldersFunction.ORGANIZAR
                 + File.separator + components.getIpServer()
                 + File.separator + components.getCnpj()
                 + File.separator + components.getYear()
-                + File.separator + FileFoldersFunction.ORGANIZAR);
+        );
         return finalPath;
     }
 
@@ -67,7 +68,7 @@ public class MoveFilesHelper {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Algo deu errado ao mover o arquivo para o destino desejado");
+            throw new RuntimeException("Algo deu errado ao mover o arquivo para o destino desejado:" + "\n" + e);
         }
     }
 
