@@ -26,5 +26,9 @@ public class FilesEntity {
     @JsonProperty(value = "file_id")
     private UUID id;
 
+    @Column(name = "file_name")
+    private String fileName;
 
+    @Column(name = "file_path")
+    private String filePath;
 }
