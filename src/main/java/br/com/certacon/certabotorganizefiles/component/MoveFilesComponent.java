@@ -31,23 +31,27 @@ public class MoveFilesComponent {
             FilesEntity saveFile = null;
             PathCreationEntity pathComponents = helper.pathSplitter(loadDirectory);
             pathComponents.setPath(loadDirectory.getPath());
-            File[] listFiles = loadDirectory.listFiles();
-            for (int i = 0; i < listFiles.length; i++) {
-                saveFile = FilesEntity.builder()
-                        .filePath(listFiles[i].getPath())
-                        .fileName(listFiles[i].getName())
-                        .status(FileStatus.CREATED)
-                        .build();
-                filesRepository.save(saveFile);
-                if (FileNameUtils.getExtension(listFiles[i].getName()).equals("txt")
-                        || FileNameUtils.getExtension(listFiles[i].getName()).equals("zip")
-                        || FileNameUtils.getExtension(listFiles[i].getName()).equals("rar")
-                        || FileNameUtils.getExtension(listFiles[i].getName()).equals("xml")) {
-                    Path organizedEFDPath = helper.pathCreatorForToOrganize(pathComponents);
-                    FileStatus fileStatus = helper.moveFile(listFiles[i], Path.of(organizedEFDPath + File.separator + listFiles[i].getName()), ATOMIC_MOVE);
-                    saveFile.setStatus(fileStatus);
+            File[] listFiles;
+            do {
+                listFiles = loadDirectory.listFiles();
+                for (int i = 0; i < listFiles.length; i++) {
+                    saveFile = FilesEntity.builder()
+                            .filePath(listFiles[i].getPath())
+                            .fileName(listFiles[i].getName())
+                            .status(FileStatus.CREATED)
+                            .build();
+                    filesRepository.save(saveFile);
+                    if (FileNameUtils.getExtension(listFiles[i].getName()).equals("txt")
+                            || FileNameUtils.getExtension(listFiles[i].getName()).equals("zip")
+                            || FileNameUtils.getExtension(listFiles[i].getName()).equals("rar")
+                            || FileNameUtils.getExtension(listFiles[i].getName()).equals("xml")) {
+                        Path organizedEFDPath = helper.pathCreatorForToOrganize(pathComponents);
+                        FileStatus fileStatus = helper.moveFile(listFiles[i], Path.of(organizedEFDPath + File.separator + listFiles[i].getName()), ATOMIC_MOVE);
+                        saveFile.setStatus(fileStatus);
+                    }
                 }
-            }
+            } while (listFiles.length == 0);
+
             return saveFile;
         } else {
             throw new FileNotFoundException("Diretório não existente");
