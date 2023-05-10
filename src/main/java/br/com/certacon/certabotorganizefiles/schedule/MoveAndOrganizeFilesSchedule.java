@@ -3,6 +3,7 @@ package br.com.certacon.certabotorganizefiles.schedule;
 import br.com.certacon.certabotorganizefiles.component.MoveFilesComponent;
 import br.com.certacon.certabotorganizefiles.entity.FilesEntity;
 import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
+import br.com.certacon.certabotorganizefiles.utils.FileStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,9 @@ public class MoveAndOrganizeFilesSchedule {
         if (!fileList.isEmpty()) {
             fileList.forEach(files -> {
                 try {
-                    files = moveFilesComponent.moveFiles(new File(files.getFilePath()));
+                    if (files.getStatus() == FileStatus.CREATED) {
+                        files = moveFilesComponent.moveFiles(new File(files.getFilePath()));
+                    }
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
                 }
