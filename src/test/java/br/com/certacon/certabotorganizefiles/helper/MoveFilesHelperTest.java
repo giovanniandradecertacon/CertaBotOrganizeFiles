@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(classes = {MoveFilesHelper.class})
-public class UnzipFilesHelperTest {
+public class MoveFilesHelperTest {
     @Autowired
     private MoveFilesHelper helper;
 
@@ -25,7 +25,7 @@ public class UnzipFilesHelperTest {
     void shouldCallUnzipFilesHelperWhenPathSplitterWhenReturnSuccess() throws FileNotFoundException {
         //Given
         File folderPath = new File("D:\\Carregamento\\192168062\\44357085000135\\2022");
-        String expected = "Carregamento";
+        String expected = "192168062";
         //When
         PathCreationEntity actual = helper.pathSplitter(folderPath);
         //Then
@@ -54,9 +54,9 @@ public class UnzipFilesHelperTest {
                 .year("2022")
                 .root("D:")
                 .build();
-        Path expected = Path.of("D:\\ORGANIZACAO\\192168062\\44357085000135\\2022\\ORGANIZADOS\\EFDPadrao");
+        Path expected = Path.of("D:\\ORGANIZADOS\\192168062\\44357085000135\\2022\\EFDPadrao");
         //When
-        Path actual = helper.pathCreatorWithObrigacaoAcessoria(entity, FileFoldersFunction.ORGANIZACAO, FileFoldersFunction.ORGANIZADOS, FileType.EFDPadrao);
+        Path actual = helper.pathCreatorWithObrigacaoAcessoria(entity, FileFoldersFunction.ORGANIZADOS, FileType.EFDPadrao);
         //Then
         assertEquals(expected, actual);
     }
