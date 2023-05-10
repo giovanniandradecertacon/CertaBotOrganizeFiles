@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -19,15 +20,21 @@ import java.util.UUID;
 public class FilesEntity {
     @Id
     @GenericGenerator(name = "UUIDGenerator", strategy = "uuid2")
-    @GeneratedValue(generator = "UUIDGenerator")
-    @Column(name = "file_id")
+    @GeneratedValue(strategy = GenerationType.UUID, generator = "UUIDGenerator")
+    @Column(name = "file_id", nullable = false)
     @JsonProperty(value = "file_id")
     private UUID id;
 
-    @Column(name = "file_name")
+    @Column(name = "created_at")
+    private Date createdAt;
+
+    @Column(name = "updated_at")
+    private Date updatedAt;
+
+    @Column(name = "file_name", nullable = false)
     private String fileName;
 
-    @Column(name = "file_path")
+    @Column(name = "file_path", nullable = false)
     private String filePath;
 
     @Column(name = "status")
