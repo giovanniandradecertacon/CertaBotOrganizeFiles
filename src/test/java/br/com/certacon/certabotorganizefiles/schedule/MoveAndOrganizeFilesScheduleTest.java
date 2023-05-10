@@ -4,6 +4,7 @@ import br.com.certacon.certabotorganizefiles.component.MoveFilesComponent;
 import br.com.certacon.certabotorganizefiles.entity.FilesEntity;
 import br.com.certacon.certabotorganizefiles.helper.MoveFilesHelper;
 import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
+import br.com.certacon.certabotorganizefiles.utils.FileStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +34,7 @@ class MoveAndOrganizeFilesScheduleTest {
     void setUp() {
         entity = FilesEntity.builder()
                 .id(UUID.randomUUID())
+                .status(FileStatus.CREATED)
                 .filePath("D:\\CARREGAMENTO\\192168062\\44357085000135\\2022")
                 .fileName("batatinha.txt")
                 .build();
