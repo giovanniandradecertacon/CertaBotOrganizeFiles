@@ -36,13 +36,12 @@ public class MoveFilesHelper {
         }
     }
 
-    public Path pathCreatorWithObrigacaoAcessoria(PathCreationEntity components, FileFoldersFunction function, FileFoldersFunction secundaryFolder, FileType obrigacaoAcessoria) {
+    public Path pathCreatorWithObrigacaoAcessoria(PathCreationEntity components, FileFoldersFunction function, FileType obrigacaoAcessoria) {
         Path finalPath = Path.of(components.getRoot()
                 + File.separator + function
                 + File.separator + components.getIpServer()
                 + File.separator + components.getCnpj()
                 + File.separator + components.getYear()
-                + File.separator + secundaryFolder
                 + File.separator + obrigacaoAcessoria
         );
         return finalPath;
