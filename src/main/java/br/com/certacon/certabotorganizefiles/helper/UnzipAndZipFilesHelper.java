@@ -6,19 +6,24 @@ import br.com.certacon.certabotorganizefiles.utils.FileStatus;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.utils.FileNameUtils;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 
 @Component
 public class UnzipAndZipFilesHelper {
-    public FileStatus directoryCreator(PathCreationEntity entityForCreation) {
+    public List<Path> directoryCreator(PathCreationEntity entityForCreation) {
+        List<Path> pathList = new ArrayList<>();
         Path uuidPath = Path.of("D:"
                 + File.separator + FileFoldersFunction.ORGANIZAR
                 + File.separator + entityForCreation.getIpServer()
@@ -33,7 +38,10 @@ public class UnzipAndZipFilesHelper {
         if (!compactedDir.toFile().exists()) compactedDir.toFile().mkdirs();
         if (!descomPactedDir.toFile().exists()) descomPactedDir.toFile().mkdirs();
 
-        return FileStatus.CREATEDDIRS;
+        pathList.add(compactedDir);
+        pathList.add(descomPactedDir);
+
+        return pathList;
     }
 
 
@@ -63,10 +71,48 @@ public class UnzipAndZipFilesHelper {
 
                 entry = entrada.getNextEntry();
             }
+            FileUtils.forceDelete(zipFile);
             return FileStatus.UNZIPPED;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public PathCreationEntity pathSplitter(File folderPath) throws FileNotFoundException {
+        if (folderPath.exists()) {
+            String folderPathReplaced = folderPath.getPath().replace(File.separator, " ");
+            String[] folderPathSplitted = folderPathReplaced.split(" ");
+            String root = folderPathSplitted[0];
+            String ipServer = folderPathSplitted[2];
+            String cnpj = folderPathSplitted[3];
+            String year = folderPathSplitted[4];
+
+            return PathCreationEntity.builder()
+                    .root(root)
+                    .ipServer(ipServer)
+                    .cnpj(cnpj)
+                    .year(year)
+                    .build();
+        } else {
+            throw new FileNotFoundException("Arquivo inexistente!");
+        }
+    }
+
+    public FileStatus extractFolder(File directory, File destDir) throws IOException {
+        File[] directoryList = directory.listFiles();
+        for (File file : directoryList) {
+            if (FileNameUtils.getExtension(file.getName()).equals("rar") ||
+                    FileNameUtils.getExtension(file.getName()).equals("zip")
+            ) {
+                Files.move(file.toPath(), Path.of(destDir + File.separator + file.getName()), ATOMIC_MOVE);
+            } else {
+                Path parentFolder = Path.of(directory.getParentFile().getPath());
+                Path filePath = Path.of(file.getPath());
+                Files.move(filePath, parentFolder.resolve(UUID.randomUUID() + "." + FileNameUtils.getExtension(file.getName())), ATOMIC_MOVE);
+            }
+        }
+        FileUtils.deleteDirectory(directory);
+        return FileStatus.MOVED;
     }
 }
