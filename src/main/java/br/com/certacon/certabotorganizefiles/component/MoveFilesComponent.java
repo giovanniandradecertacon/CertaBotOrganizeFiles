@@ -5,9 +5,8 @@ import br.com.certacon.certabotorganizefiles.entity.PathCreationEntity;
 import br.com.certacon.certabotorganizefiles.helper.MoveFilesHelper;
 import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
 import br.com.certacon.certabotorganizefiles.utils.FileStatus;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.FileNameUtils;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,8 +14,7 @@ import java.nio.file.Path;
 
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 
-@Service
-@Slf4j
+@Component
 public class MoveFilesComponent {
     private final MoveFilesHelper helper;
     private final FilesRepository filesRepository;
@@ -44,10 +42,12 @@ public class MoveFilesComponent {
                     if (FileNameUtils.getExtension(listFiles[i].getName()).equals("txt")
                             || FileNameUtils.getExtension(listFiles[i].getName()).equals("zip")
                             || FileNameUtils.getExtension(listFiles[i].getName()).equals("rar")
-                            || FileNameUtils.getExtension(listFiles[i].getName()).equals("xml")) {
-                        Path organizedEFDPath = helper.pathCreatorForToOrganize(pathComponents);
-                        FileStatus fileStatus = helper.moveFile(listFiles[i], Path.of(organizedEFDPath + File.separator + listFiles[i].getName()), ATOMIC_MOVE);
+                            || FileNameUtils.getExtension(listFiles[i].getName()).equals("xml")
+                            || listFiles[i].isDirectory()) {
+                        Path organizeEFDPath = helper.pathCreatorForToOrganize(pathComponents);
+                        FileStatus fileStatus = helper.moveFile(listFiles[i], Path.of(organizeEFDPath + File.separator + listFiles[i].getName()), ATOMIC_MOVE);
                         saveFile.setStatus(fileStatus);
+                        saveFile.setFilePath(Path.of(organizeEFDPath + File.separator + listFiles[i].getName()).toString());
                     }
                 }
             } while (listFiles.length == 0);
