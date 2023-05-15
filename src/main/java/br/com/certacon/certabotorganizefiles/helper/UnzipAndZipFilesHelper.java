@@ -71,7 +71,6 @@ public class UnzipAndZipFilesHelper {
 
                 entry = entrada.getNextEntry();
             }
-            FileUtils.forceDelete(zipFile);
             return FileStatus.UNZIPPED;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -114,5 +113,26 @@ public class UnzipAndZipFilesHelper {
         }
         FileUtils.deleteDirectory(directory);
         return FileStatus.MOVED;
+    }
+
+
+    public Boolean checkFolderExistence(File[] fileList) {
+        for (int i = 0; i < fileList.length; i++) {
+            if (fileList[i].isDirectory()) {
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    public Boolean checkZipExistence(File[] fileList) {
+        for (int i = 0; i < fileList.length; i++) {
+            if (FileNameUtils.getExtension(fileList[i].getName()).equals("zip")
+                    || FileNameUtils.getExtension(fileList[i].getName()).equals("rar")
+            ) {
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
     }
 }
