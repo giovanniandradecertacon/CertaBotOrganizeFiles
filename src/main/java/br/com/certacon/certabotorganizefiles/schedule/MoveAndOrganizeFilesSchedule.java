@@ -1,6 +1,7 @@
 package br.com.certacon.certabotorganizefiles.schedule;
 
 import br.com.certacon.certabotorganizefiles.component.MoveFilesComponent;
+import br.com.certacon.certabotorganizefiles.component.OrganizeComponent;
 import br.com.certacon.certabotorganizefiles.component.UnzipFilesComponent;
 import br.com.certacon.certabotorganizefiles.entity.FilesEntity;
 import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
@@ -18,12 +19,14 @@ import java.util.List;
 public class MoveAndOrganizeFilesSchedule {
     private final MoveFilesComponent moveFilesComponent;
     private final UnzipFilesComponent unzipFilesComponent;
+    private final OrganizeComponent organizeComponent;
 
     private final FilesRepository filesRepository;
 
-    public MoveAndOrganizeFilesSchedule(MoveFilesComponent moveFilesComponent, UnzipFilesComponent unzipFilesComponent, FilesRepository filesRepository) {
+    public MoveAndOrganizeFilesSchedule(MoveFilesComponent moveFilesComponent, UnzipFilesComponent unzipFilesComponent, OrganizeComponent organizeComponent, FilesRepository filesRepository) {
         this.moveFilesComponent = moveFilesComponent;
         this.unzipFilesComponent = unzipFilesComponent;
+        this.organizeComponent = organizeComponent;
         this.filesRepository = filesRepository;
     }
 
@@ -36,11 +39,14 @@ public class MoveAndOrganizeFilesSchedule {
                     if (files.getStatus() == FileStatus.CREATED
                             || files.getStatus() == FileStatus.UPDATED) {
                         files = moveFilesComponent.moveFiles(new File(files.getFilePath()));
-                        filesRepository.save(files);
                         if (files.getStatus() == FileStatus.MOVED && FileNameUtils.getExtension(files.getFileName()).equals("rar")
                                 || FileNameUtils.getExtension(files.getFileName()).equals("zip")) {
                             files = unzipFilesComponent.MoveAndUnzip(new File(files.getFilePath()));
                             filesRepository.save(files);
+                            if (files.getStatus() == FileStatus.EXTRACTED) {
+                                FileStatus fileStatus = organizeComponent.organizeFilesForZipping(new File(files.getFilePath()), files.getId());
+                                System.out.println(fileStatus);
+                            }
                         }
                     }
                 } catch (FileNotFoundException e) {
