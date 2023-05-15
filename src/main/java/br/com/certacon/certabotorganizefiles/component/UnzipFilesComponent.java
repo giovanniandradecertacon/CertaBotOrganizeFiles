@@ -3,12 +3,14 @@ package br.com.certacon.certabotorganizefiles.component;
 import br.com.certacon.certabotorganizefiles.entity.FilesEntity;
 import br.com.certacon.certabotorganizefiles.entity.PathCreationEntity;
 import br.com.certacon.certabotorganizefiles.helper.UnzipAndZipFilesHelper;
+import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
 import br.com.certacon.certabotorganizefiles.utils.FileStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,10 +21,13 @@ import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 @Component
 @Slf4j
 public class UnzipFilesComponent {
+    private final FilesRepository filesRepository;
     private final UnzipAndZipFilesHelper helper;
 
-    public UnzipFilesComponent(UnzipAndZipFilesHelper helper) {
+    public UnzipFilesComponent(UnzipAndZipFilesHelper helper,
+                               FilesRepository filesRepository) {
         this.helper = helper;
+        this.filesRepository = filesRepository;
     }
 
     public FilesEntity MoveAndUnzip(File zipFile) throws IOException {
@@ -30,22 +35,58 @@ public class UnzipFilesComponent {
             PathCreationEntity pathComponents = helper.pathSplitter(zipFile);
             List<Path> paths = helper.directoryCreator(pathComponents);
 
+            File uuidDir = paths.get(0).getParent().toFile();
             File compactedDir = paths.get(0).toFile();
             File descompactedDir = paths.get(1).toFile();
 
             Path destPath = Files.move(zipFile.toPath(), Path.of(compactedDir.toPath() + File.separator + zipFile.getName()), ATOMIC_MOVE);
 
             FileStatus status = helper.unzipFile(destPath.toFile(), descompactedDir);
-            if (status.equals(FileStatus.UNZIPPED)) {
+            Files.deleteIfExists(destPath);
 
-                File[] descompactedList = descompactedDir.listFiles();
-                for (int i = 0; i < descompactedList.length; i++) {
-                    if (FileNameUtils.getExtension(descompactedList[i].getName()).equals("zip")) {
-                        Files.move(descompactedList[i].toPath(), Path.of(compactedDir + descompactedList[i].getName()));
+            if (status.equals(FileStatus.UNZIPPED)) {
+                File[] descompactedList;
+                do {
+                    descompactedList = descompactedDir.listFiles();
+                    if (descompactedList.length > 0) {
+                        for (int i = 0; i < descompactedList.length; i++) {
+                            if (descompactedList[i].isDirectory()) {
+                                FileStatus fileStatus = helper.extractFolder(descompactedList[i], compactedDir);
+                                log.info(fileStatus.name());
+                            }
+                            if (FileNameUtils.getExtension(descompactedList[i].getName()).equals("zip")
+                                    || FileNameUtils.getExtension(descompactedList[i].getName()).equals("rar")) {
+                                Files.move(descompactedList[i].toPath(), Path.of(compactedDir + descompactedList[i].getName()));
+
+                            }
+                        }
                     }
-                }
+
+                    File[] compactedList = compactedDir.listFiles();
+                    if (compactedList.length > 0) {
+                        for (int i = 0; i < compactedList.length; i++) {
+                            FileStatus fileStatus = helper.unzipFile(compactedList[i], descompactedDir);
+                            Files.deleteIfExists(compactedList[i].toPath());
+                            log.info(fileStatus.name());
+                        }
+                    }
+                    descompactedList = descompactedDir.listFiles();
+                } while (helper.checkFolderExistence(descompactedList) == Boolean.TRUE);
+
+                Files.deleteIfExists(compactedDir.toPath());
+
+                helper.extractFolder(descompactedDir, descompactedDir.getParentFile());
+
             }
+            FilesEntity fileForSave = FilesEntity.builder()
+                    .filePath(uuidDir.getPath())
+                    .fileName(compactedDir.getParentFile().getName())
+                    .status(FileStatus.EXTRACTED)
+                    .build();
+            return fileForSave;
+        } else {
+            throw new FileNotFoundException("Arquivo não foi encontrado");
         }
-        return null;
+
     }
 }
