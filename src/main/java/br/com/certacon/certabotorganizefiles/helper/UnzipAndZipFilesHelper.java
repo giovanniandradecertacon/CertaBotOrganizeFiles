@@ -14,9 +14,12 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 
@@ -125,14 +128,27 @@ public class UnzipAndZipFilesHelper {
         return Boolean.FALSE;
     }
 
-    public Boolean checkZipExistence(File[] fileList) {
-        for (int i = 0; i < fileList.length; i++) {
-            if (FileNameUtils.getExtension(fileList[i].getName()).equals("zip")
-                    || FileNameUtils.getExtension(fileList[i].getName()).equals("rar")
-            ) {
-                return Boolean.TRUE;
+    public FileStatus zipFiles(File descompactedDir, File destiny) throws IOException {
+        File[] descompactedList = descompactedDir.listFiles();
+        final FileOutputStream fos = new FileOutputStream(Paths.get(destiny.getPath()).toAbsolutePath() + File.separator + descompactedDir.getName() + ".zip");
+        ZipOutputStream zipOut = new ZipOutputStream(fos);
+
+        for (File srcFile : descompactedList) {
+            File fileToZip = new File(srcFile.toURI());
+            FileInputStream fis = new FileInputStream(fileToZip);
+            ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+            zipOut.putNextEntry(zipEntry);
+
+            byte[] buffer = new byte[8192];
+            int length;
+            while ((length = fis.read(buffer)) >= 0) {
+                zipOut.write(buffer, 0, length);
             }
+            fis.close();
         }
-        return Boolean.FALSE;
+        zipOut.close();
+        fos.close();
+        descompactedDir.deleteOnExit();
+        return FileStatus.ZIPPED;
     }
 }
