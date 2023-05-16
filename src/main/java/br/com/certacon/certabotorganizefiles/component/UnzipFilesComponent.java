@@ -30,7 +30,8 @@ public class UnzipFilesComponent {
         this.filesRepository = filesRepository;
     }
 
-    public FilesEntity MoveAndUnzip(File zipFile) throws IOException {
+    public FilesEntity MoveAndUnzip(FilesEntity entity) throws IOException {
+        File zipFile = new File(entity.getFilePath());
         if (zipFile.exists()) {
             PathCreationEntity pathComponents = helper.pathSplitter(zipFile);
             List<Path> paths = helper.directoryCreator(pathComponents);
@@ -78,12 +79,11 @@ public class UnzipFilesComponent {
                 helper.extractFolder(descompactedDir, descompactedDir.getParentFile());
 
             }
-            FilesEntity fileForSave = FilesEntity.builder()
-                    .filePath(uuidDir.getPath())
-                    .fileName(compactedDir.getParentFile().getName())
-                    .status(FileStatus.EXTRACTED)
-                    .build();
-            return fileForSave;
+
+            entity.setFileName(uuidDir.getName());
+            entity.setStatus(FileStatus.EXTRACTED);
+            entity.setFilePath(uuidDir.getPath());
+            return entity;
         } else {
             throw new FileNotFoundException("Arquivo não foi encontrado");
         }
