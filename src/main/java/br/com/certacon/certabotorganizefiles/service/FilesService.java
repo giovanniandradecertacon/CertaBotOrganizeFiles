@@ -20,9 +20,10 @@ public class FilesService {
 
     public FilesEntity saveOrUpdate(FilesEntity entity) {
         if (validate(entity).equals(Boolean.TRUE)) {
-            Optional<FilesEntity> existingEntity = filesRepository.findById(entity.getId());
+            Optional<FilesEntity> existingEntity = filesRepository.findByFileName(entity.getFileName());
             if (existingEntity.isPresent()) {
                 FilesEntity updatedEntity = update(existingEntity.get(), entity);
+                entity.setStatus(FileStatus.UPDATED);
                 return filesRepository.save(updatedEntity);
             } else {
                 entity.setCreatedAt(new Date());
