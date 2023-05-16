@@ -2,6 +2,7 @@ package br.com.certacon.certabotorganizefiles.controller;
 
 
 import br.com.certacon.certabotorganizefiles.entity.FilesEntity;
+import br.com.certacon.certabotorganizefiles.exception.MessageExceptionHandler;
 import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
 import br.com.certacon.certabotorganizefiles.service.FilesService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,9 +31,9 @@ public class FilesController {
     }
 
     @PostMapping
-    @Operation(description = "Cria o Bot")
+    @Operation(description = "Cria a entidade do Arquivo")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Bot criado!", content = {@Content(mediaType = "application/json",
+            @ApiResponse(responseCode = "200", description = "Arquivo criado!", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = FilesEntity.class))}),
             @ApiResponse(responseCode = "400", description = "Informação inserida esta errada",
                     content = {@Content(mediaType = "application/json",
@@ -47,14 +48,14 @@ public class FilesController {
 
 
     @GetMapping
-    @Operation(description = "Busca todos Bots")
+    @Operation(description = "Busca todos Arquivos")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Bot(s) encontrado(s)!", content = {@Content(mediaType = "application/json",
+            @ApiResponse(responseCode = "200", description = "Arquivos(s) encontrado(s)!", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = FilesEntity.class))}),
             @ApiResponse(responseCode = "400", description = "Informação inserida está errada",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageExceptionHandler.class))}),
-            @ApiResponse(responseCode = "404", description = "Bot(s) não encontrado(s)", content = {@Content(mediaType = "application/json",
+            @ApiResponse(responseCode = "404", description = "Arquivos(s) não encontrado(s)", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = MessageExceptionHandler.class))}),
             @ApiResponse(responseCode = "500", description = "Erro no servidor", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = MessageExceptionHandler.class))})
@@ -69,14 +70,14 @@ public class FilesController {
     }
 
     @PutMapping
-    @Operation(description = "Atualiza um Bot")
+    @Operation(description = "Atualiza um Arquivo")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Bot atualizado!", content = {@Content(mediaType = "application/json",
+            @ApiResponse(responseCode = "200", description = "Arquivo atualizado!", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = FilesEntity.class))}),
             @ApiResponse(responseCode = "400", description = "Informação inserida esta errada",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageExceptionHandler.class))}),
-            @ApiResponse(responseCode = "404", description = "Bot não foi encontrado", content = {@Content(mediaType = "application/json",
+            @ApiResponse(responseCode = "404", description = "Arquivo não foi encontrado", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = MessageExceptionHandler.class))}),
             @ApiResponse(responseCode = "500", description = "Erro no servidor", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = MessageExceptionHandler.class))})
@@ -87,13 +88,13 @@ public class FilesController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(description = "Deleta um Bot")
+    @Operation(description = "Deleta um Arquivo")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Bot deletado!", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Arquivo deletado!", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Informação inserida esta errada",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MessageExceptionHandler.class))}),
-            @ApiResponse(responseCode = "404", description = "Bot não foi encontrado", content = {@Content(mediaType = "application/json",
+            @ApiResponse(responseCode = "404", description = "Arquivo não foi encontrado", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = MessageExceptionHandler.class))}),
             @ApiResponse(responseCode = "500", description = "Erro no servidor", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = MessageExceptionHandler.class))})
@@ -101,7 +102,7 @@ public class FilesController {
     public ResponseEntity delete(@PathVariable(value = "id") UUID id) throws FileNotFoundException {
         boolean entity = filesService.delete(id);
         if (entity == Boolean.FALSE) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bot não foi encontrado!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Arquivo não foi encontrado!");
         }
         return ResponseEntity.status(HttpStatus.OK).body("Deletado com Sucesso");
     }
