@@ -19,20 +19,24 @@ public class PostRestTemplateSchedule {
     private final PostRestTemplateService postRestTemplateService;
     private final UserFilesRepository userFilesRepository;
     @Value("${config.downloadPath}")
-    private String downloadPath;
+    private final String downloadPath;
 
     @Value("${config.dockerPathDownload}")
-    private String dockerPathDownload;
+    private final String dockerPathDownload;
 
     @Value("${config.usuario}")
-    private String usuario;
+    private final String usuario;
 
     @Value("${config.senha}")
-    private String senha;
+    private final String senha;
 
-    public PostRestTemplateSchedule(PostRestTemplateService postRestTemplateService, UserFilesRepository userFilesRepository) {
+    public PostRestTemplateSchedule(PostRestTemplateService postRestTemplateService, UserFilesRepository userFilesRepository, @Value("${config.downloadPath}") String downloadPath, @Value("${config.dockerPathDownload}") String dockerPathDownload, @Value("${config.usuario}") String usuario, @Value("${config.senha}") String senha) {
         this.postRestTemplateService = postRestTemplateService;
         this.userFilesRepository = userFilesRepository;
+        this.downloadPath = downloadPath;
+        this.dockerPathDownload = dockerPathDownload;
+        this.usuario = usuario;
+        this.senha = senha;
     }
 
     @Scheduled(fixedRate = 30000, initialDelay = 90000)
