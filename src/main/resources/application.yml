@@ -14,3 +14,12 @@ spring:
     url: jdbc:sqlserver://192.168.0.61;databaseName=CertaBotOrganize;encrypt=false;integratedSecurity=false;
     username: giovanni.andrade
     password: gigi1704
+
+config:
+  downloadPath: /home/selenium/Downloads
+  dockerPathDownload: http://192.168.1.64:8094/LoadFile/downloads/
+  archivedFilesDir: D:\Arquivados\
+  sentFilesDir: D:\Enviados\
+  zipFilesDir: D:\
+  usuario: giovanni.andrade@certacon.com.br
+  senha: 1
