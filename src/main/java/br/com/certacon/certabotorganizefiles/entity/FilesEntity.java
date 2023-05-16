@@ -3,24 +3,22 @@ package br.com.certacon.certabotorganizefiles.entity;
 import br.com.certacon.certabotorganizefiles.utils.FileStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class FilesEntity {
     @Id
     @GenericGenerator(name = "UUIDGenerator", strategy = "uuid2")
-    @GeneratedValue(strategy = GenerationType.UUID, generator = "UUIDGenerator")
+    @GeneratedValue(generator = "UUIDGenerator")
     @Column(name = "file_id", nullable = false)
     @JsonProperty(value = "file_id")
     private UUID id;
