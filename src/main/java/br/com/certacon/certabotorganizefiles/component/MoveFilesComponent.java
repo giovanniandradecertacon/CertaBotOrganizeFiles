@@ -25,7 +25,7 @@ public class MoveFilesComponent {
     }
 
     public FilesEntity moveFiles(File loadDirectory) throws FileNotFoundException {
-        if (loadDirectory.exists()) {
+        if (loadDirectory.exists() && loadDirectory.isDirectory()) {
             FilesEntity saveFile = null;
             PathCreationEntity pathComponents = helper.pathSplitter(loadDirectory);
             pathComponents.setPath(loadDirectory.getPath());
