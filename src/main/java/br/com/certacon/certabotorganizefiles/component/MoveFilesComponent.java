@@ -5,6 +5,7 @@ import br.com.certacon.certabotorganizefiles.entity.PathCreationEntity;
 import br.com.certacon.certabotorganizefiles.helper.MoveFilesHelper;
 import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
 import br.com.certacon.certabotorganizefiles.utils.FileStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 
 @Component
+@Slf4j
 public class MoveFilesComponent {
     private final MoveFilesHelper helper;
     private final FilesRepository filesRepository;
@@ -24,21 +26,15 @@ public class MoveFilesComponent {
         this.filesRepository = filesRepository;
     }
 
-    public FilesEntity moveFiles(File loadDirectory) throws FileNotFoundException {
-        if (loadDirectory.exists() && loadDirectory.isDirectory()) {
-            FilesEntity saveFile = null;
-            PathCreationEntity pathComponents = helper.pathSplitter(loadDirectory);
-            pathComponents.setPath(loadDirectory.getPath());
+    public FilesEntity moveFiles(FilesEntity entity) throws FileNotFoundException {
+        File entityFile = new File(entity.getFilePath());
+        if (entityFile.exists() && entityFile.isDirectory()) {
+            PathCreationEntity pathComponents = helper.pathSplitter(entityFile);
+            pathComponents.setPath(entityFile.getPath());
             File[] listFiles;
             do {
-                listFiles = loadDirectory.listFiles();
+                listFiles = entityFile.listFiles();
                 for (int i = 0; i < listFiles.length; i++) {
-                    saveFile = FilesEntity.builder()
-                            .filePath(listFiles[i].getPath())
-                            .fileName(listFiles[i].getName())
-                            .status(FileStatus.CREATED)
-                            .build();
-                    filesRepository.save(saveFile);
                     if (FileNameUtils.getExtension(listFiles[i].getName()).equals("txt")
                             || FileNameUtils.getExtension(listFiles[i].getName()).equals("zip")
                             || FileNameUtils.getExtension(listFiles[i].getName()).equals("rar")
@@ -46,13 +42,14 @@ public class MoveFilesComponent {
                             || listFiles[i].isDirectory()) {
                         Path organizeEFDPath = helper.pathCreatorForToOrganize(pathComponents);
                         FileStatus fileStatus = helper.moveFile(listFiles[i], Path.of(organizeEFDPath + File.separator + listFiles[i].getName()), ATOMIC_MOVE);
-                        saveFile.setStatus(fileStatus);
-                        saveFile.setFilePath(Path.of(organizeEFDPath + File.separator + listFiles[i].getName()).toString());
+                        entity.setStatus(fileStatus);
+                        entity.setFilePath(organizeEFDPath.toString() + File.separator + listFiles[i].getName());
+                        entity.setFileName(listFiles[i].getName());
                     }
                 }
             } while (listFiles.length == 0);
 
-            return saveFile;
+            return entity;
         } else {
             throw new FileNotFoundException("Diretório não existente");
         }
