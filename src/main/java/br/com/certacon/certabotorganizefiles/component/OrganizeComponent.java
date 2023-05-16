@@ -35,12 +35,12 @@ public class OrganizeComponent {
             for (int i = 0; i < filesList.length; i++) {
 
                 if (FileNameUtils.getExtension(filesList[i].getName()).equals("xml")) {
-                    Path xmlFolder = Path.of(filesList[i].getParentFile() + File.separator + "XMLS-" + fileEntity.get().getId().toString());
+                    Path xmlFolder = Path.of(filesList[i].getParentFile() + File.separator + "XMLS-" + fileEntity.get().getId().toString().toUpperCase());
                     if (!xmlFolder.toFile().exists()) xmlFolder.toFile().mkdirs();
                     Files.move(filesList[i].toPath(), Path.of(xmlFolder + File.separator + filesList[i].getName()), ATOMIC_MOVE);
 
                 } else if (FileNameUtils.getExtension(filesList[i].getName()).equals("txt")) {
-                    Path efdFolder = Path.of(filesList[i].getParentFile() + File.separator + "EFDS-" + fileEntity.get().getId().toString());
+                    Path efdFolder = Path.of(filesList[i].getParentFile() + File.separator + "EFDS-" + fileEntity.get().getId().toString().toUpperCase());
                     if (!efdFolder.toFile().exists()) efdFolder.toFile().mkdirs();
                     Files.move(filesList[i].toPath(), Path.of(efdFolder + File.separator + filesList[i].getName()), ATOMIC_MOVE);
                 } else {
