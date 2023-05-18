@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/files")
+@RequestMapping("files")
 public class FilesController {
     private final FilesService filesService;
 
