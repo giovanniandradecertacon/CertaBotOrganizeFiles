@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class PostRestTemplateService {
+public class PostRestTemplateEFDPadraoService {
     private RestTemplate restTemplate;
 
-    public PostRestTemplateService() {
-        this.restTemplate = new RestTemplateBuilder().rootUri("http://192.168.1.64:8092/certabot").build();
+    public PostRestTemplateEFDPadraoService() {
+        this.restTemplate = new RestTemplateBuilder().rootUri("http://192.168.1.46:8092/certabot").build();
     }
 
     public ResponseEntity<ArquivoEfdModelVO> enviarArquivoEfd(ArquivoEfdVO arquivoEfdVO) {
