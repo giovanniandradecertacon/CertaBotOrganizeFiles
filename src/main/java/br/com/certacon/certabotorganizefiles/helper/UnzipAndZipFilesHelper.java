@@ -9,6 +9,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -25,10 +26,16 @@ import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 
 @Component
 public class UnzipAndZipFilesHelper {
+    @Value("${config.rootDir}")
+    private final String root;
+
+    public UnzipAndZipFilesHelper(@Value("${config.rootDir}") String root) {
+        this.root = root;
+    }
+
     public List<Path> directoryCreator(PathCreationEntity entityForCreation) {
         List<Path> pathList = new ArrayList<>();
-        Path uuidPath = Path.of("D:"
-                + File.separator + FileFoldersFunction.ORGANIZAR
+        Path uuidPath = Path.of(root + FileFoldersFunction.ORGANIZAR
                 + File.separator + entityForCreation.getIpServer()
                 + File.separator + entityForCreation.getCnpj()
                 + File.separator + entityForCreation.getYear()
@@ -128,7 +135,7 @@ public class UnzipAndZipFilesHelper {
         return Boolean.FALSE;
     }
 
-    public FileStatus zipFiles(File descompactedDir, File destiny) throws IOException {
+    public Path zipFiles(File descompactedDir, File destiny) throws IOException {
         File[] descompactedList = descompactedDir.listFiles();
         final FileOutputStream fos = new FileOutputStream(Paths.get(destiny.getPath()).toAbsolutePath() + File.separator + descompactedDir.getName() + ".zip");
         ZipOutputStream zipOut = new ZipOutputStream(fos);
@@ -149,6 +156,6 @@ public class UnzipAndZipFilesHelper {
         zipOut.close();
         fos.close();
         descompactedDir.deleteOnExit();
-        return FileStatus.ZIPPED;
+        return Path.of(destiny.getPath() + File.separator + descompactedDir.getName() + ".zip");
     }
 }
