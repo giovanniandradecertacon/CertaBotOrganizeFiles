@@ -1,7 +1,7 @@
 server:
   port: 8068
   servlet:
-    context-path: /certaBotOrganize
+    context-path: /CertaBotOrganize
 
 spring:
   application:
@@ -17,9 +17,9 @@ spring:
 
 config:
   downloadPath: /home/selenium/Downloads
-  dockerPathDownload: http://192.168.1.64:8094/LoadFile/downloads/
+  dockerPathDownload: http://192.168.1.46:8068/CertaBotOrganize/downloads/
   archivedFilesDir: D:\Arquivados\
   sentFilesDir: D:\Enviados\
-  zipFilesDir: D:\
+  rootDir: D:\
   usuario: giovanni.andrade@certacon.com.br
   senha: 1
