@@ -35,6 +35,11 @@ public class FilesEntity {
     @Column(name = "file_path", nullable = false)
     private String filePath;
 
+    @Column(name = "cnpj", nullable = false)
+    private String cnpj;
+
+    @Column(name = "ip_servidor", nullable = false)
+    private String ipServer;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private FileStatus status;
