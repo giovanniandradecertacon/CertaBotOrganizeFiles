@@ -2,7 +2,6 @@ package br.com.certacon.certabotorganizefiles.schedule;
 
 import br.com.certacon.certabotorganizefiles.component.*;
 import br.com.certacon.certabotorganizefiles.entity.FilesEntity;
-import br.com.certacon.certabotorganizefiles.entity.UserFilesEntity;
 import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
 import br.com.certacon.certabotorganizefiles.utils.FileStatus;
 import org.apache.commons.compress.utils.FileNameUtils;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -54,18 +53,33 @@ public class MoveAndOrganizeFilesSchedule {
                                 filesRepository.save(files);
                             }
                             if (files.getStatus() == FileStatus.READY) {
-                                Path filePath = zipFilesComponent.zipFilesForUpload(new File(files.getFilePath()));
-                                files.setStatus(FileStatus.ZIPPED);
-                                files.setFilePath(filePath.toString());
-                                filesRepository.save(files);
-                            }
-                            if (files.getStatus() == FileStatus.ZIPPED) {
-                                UserFilesEntity userForRest = saveFilesForRestComponent.saveFilesForRest(files);
-                                userForRest.getFileName();
-                            }
-                        }
+                                List<File> filePath = zipFilesComponent.zipFilesForUpload(new File(files.getFilePath()));
+                                for (int i = 0; i < filePath.size(); i++) {
+                                    FilesEntity entity = FilesEntity.builder()
+                                            .status(FileStatus.ZIPPED)
+                                            .fileName(filePath.get(i).getName())
+                                            .filePath(filePath.get(i).getPath())
+                                            .cnpj(files.getCnpj())
+                                            .ipServer(files.getIpServer())
+                                            .createdAt(new Date())
+                                            .build();
+                                    filesRepository.save(entity);
+                                    files.setStatus(FileStatus.READED);
+                                    filesRepository.save(files);
+                                }
 
+
+                            }
+
+                        }
                     }
+
+                    if (files.getStatus() == FileStatus.ZIPPED && files.getFileName().startsWith("EFDS-")) {
+                        saveFilesForRestComponent.saveFilesForRestNFe(files);
+                        files.setStatus(FileStatus.SAVED);
+                        filesRepository.save(files);
+                    }
+
                 } catch (FileNotFoundException e) {
                     files.setStatus(FileStatus.ERROR);
                     filesRepository.save(files);
