@@ -5,6 +5,7 @@ import br.com.certacon.certabotorganizefiles.vo.ArquivoEfdModelVO;
 import br.com.certacon.certabotorganizefiles.vo.ArquivoEfdVO;
 import br.com.certacon.certabotorganizefiles.vo.ProcessFileModelVO;
 import br.com.certacon.certabotorganizefiles.vo.ProcessFileVO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,12 @@ import org.springframework.web.client.RestTemplate;
 public class PostRestTemplateEFDPadraoService {
     private RestTemplate restTemplate;
 
+    @Value("${config.restBuilderEFDPadrao}")
+    private String restBuilder;
+
+
     public PostRestTemplateEFDPadraoService() {
-        this.restTemplate = new RestTemplateBuilder().rootUri("http://192.168.1.46:8092/certabot").build();
+        this.restTemplate = new RestTemplateBuilder().rootUri(restBuilder).build();
     }
 
     public ResponseEntity<ArquivoEfdModelVO> enviarArquivoEfd(ArquivoEfdVO arquivoEfdVO) {
