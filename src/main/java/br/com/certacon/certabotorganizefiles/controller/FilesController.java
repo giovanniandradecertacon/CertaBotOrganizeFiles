@@ -60,7 +60,7 @@ public class FilesController {
             @ApiResponse(responseCode = "500", description = "Erro no servidor", content = {@Content(mediaType = "application/json",
                     schema = @Schema(implementation = MessageExceptionHandler.class))})
     })
-    public ResponseEntity<List<FilesEntity>> GetAllBots() {
+    public ResponseEntity<List<FilesEntity>> getAll() {
         try {
             List<FilesEntity> botList = filesRepository.findAll();
             return ResponseEntity.status(HttpStatus.OK).body(botList);
