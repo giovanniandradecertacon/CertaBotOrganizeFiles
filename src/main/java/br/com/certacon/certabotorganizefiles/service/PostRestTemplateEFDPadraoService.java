@@ -13,13 +13,12 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class PostRestTemplateEFDPadraoService {
+    private final String restBuilder;
     private RestTemplate restTemplate;
 
-    @Value("${config.restBuilderEFDPadrao}")
-    private String restBuilder;
 
-
-    public PostRestTemplateEFDPadraoService() {
+    public PostRestTemplateEFDPadraoService(@Value("${config.restBuilderEFDPadrao}") String restBuilder) {
+        this.restBuilder = restBuilder;
         this.restTemplate = new RestTemplateBuilder().rootUri(restBuilder).build();
     }
 
