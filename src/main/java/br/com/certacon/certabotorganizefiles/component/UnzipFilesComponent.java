@@ -3,7 +3,6 @@ package br.com.certacon.certabotorganizefiles.component;
 import br.com.certacon.certabotorganizefiles.entity.FilesEntity;
 import br.com.certacon.certabotorganizefiles.entity.PathCreationEntity;
 import br.com.certacon.certabotorganizefiles.helper.UnzipAndZipFilesHelper;
-import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
 import br.com.certacon.certabotorganizefiles.utils.FileStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.FileNameUtils;
@@ -21,13 +20,10 @@ import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 @Component
 @Slf4j
 public class UnzipFilesComponent {
-    private final FilesRepository filesRepository;
     private final UnzipAndZipFilesHelper helper;
 
-    public UnzipFilesComponent(UnzipAndZipFilesHelper helper,
-                               FilesRepository filesRepository) {
+    public UnzipFilesComponent(UnzipAndZipFilesHelper helper) {
         this.helper = helper;
-        this.filesRepository = filesRepository;
     }
 
     public FilesEntity MoveAndUnzip(FilesEntity entity) throws IOException {
