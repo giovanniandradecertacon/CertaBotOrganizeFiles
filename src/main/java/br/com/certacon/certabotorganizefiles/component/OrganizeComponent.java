@@ -43,6 +43,11 @@ public class OrganizeComponent {
                     Path efdFolder = Path.of(filesList[i].getParentFile() + File.separator + "EFDS-" + fileEntity.get().getId().toString().toUpperCase());
                     if (!efdFolder.toFile().exists()) efdFolder.toFile().mkdirs();
                     Files.move(filesList[i].toPath(), Path.of(efdFolder + File.separator + filesList[i].getName()), ATOMIC_MOVE);
+                } else if (FileNameUtils.getExtension(filesList[i].getName()).equals("zip")) {
+                    String parentFile = new File(filesList[i].getPath()).getParentFile().getName();
+                    String loadPath = filesList[i].getPath().replace("ORGANIZAR", "CARREGAMENTO");
+                    String finalPath = loadPath.replace(File.separator + parentFile, "");
+                    Files.move(filesList[i].toPath(), Path.of(finalPath), ATOMIC_MOVE);
                 } else {
                     PathCreationEntity creationEntity = helper.pathSplitter(filesList[i]);
                     Path archivedFolder = Path.of(creationEntity.getRoot()
@@ -59,3 +64,4 @@ public class OrganizeComponent {
         }
     }
 }
+
