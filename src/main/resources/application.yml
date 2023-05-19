@@ -21,5 +21,7 @@ config:
   archivedFilesDir: D:\Arquivados\
   sentFilesDir: D:\Enviados\
   rootDir: D:\
+  restBuilderNFe: http://192.168.1.46:8061/CertabotNFe
+  restBuilderEFDPadrao: http://192.168.1.46:8092/certabot
   usuario: giovanni.andrade@certacon.com.br
   senha: 1
