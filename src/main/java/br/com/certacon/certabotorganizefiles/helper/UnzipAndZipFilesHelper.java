@@ -158,4 +158,26 @@ public class UnzipAndZipFilesHelper {
         descompactedDir.deleteOnExit();
         return Path.of(destiny.getPath() + File.separator + descompactedDir.getName() + ".zip");
     }
+
+    public Path zipOneFile(File sourceFile, File destiny) throws IOException {
+        FileOutputStream fos = new FileOutputStream(destiny);
+        ZipOutputStream zos = new ZipOutputStream(fos);
+
+        ZipEntry zipEntry = new ZipEntry(sourceFile.getName());
+        zos.putNextEntry(zipEntry);
+
+        FileInputStream fis = new FileInputStream(sourceFile);
+        byte[] buffer = new byte[8092];
+        int length;
+        while ((length = fis.read(buffer)) > 0) {
+            zos.write(buffer, 0, length);
+        }
+
+        fis.close();
+        zos.closeEntry();
+        zos.close();
+        fos.close();
+
+        return destiny.toPath();
+    }
 }
