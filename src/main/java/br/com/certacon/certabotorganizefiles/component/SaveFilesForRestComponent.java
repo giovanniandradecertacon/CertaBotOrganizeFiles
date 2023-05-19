@@ -21,7 +21,7 @@ public class SaveFilesForRestComponent {
         this.userFilesRepository = userFilesRepository;
     }
 
-    public UserFilesEntity saveFilesForRestNFe(FilesEntity entity) throws IOException {
+    public UserFilesEntity saveFilesForRestEFDPadrao(FilesEntity entity) throws IOException {
 
         String mimeType = Files.probeContentType(Path.of(entity.getFilePath()));
         UserFilesEntity userFilesEntity = UserFilesEntity.builder()
@@ -29,7 +29,7 @@ public class SaveFilesForRestComponent {
                 .createdAt(new Date())
                 .path(entity.getFilePath())
                 .cnpj(entity.getCnpj())
-                .status(FileStatus.CREATED)
+                .status(FileStatus.CREATED_EFD)
                 .mimeType(mimeType)
                 .ipServer(entity.getIpServer())
                 .build();
