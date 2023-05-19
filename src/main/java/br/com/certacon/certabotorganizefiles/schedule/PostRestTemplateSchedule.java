@@ -46,7 +46,7 @@ public class PostRestTemplateSchedule {
         if (modelList.size() > 0) {
             for (int i = 0; i < modelList.size(); i++) {
                 modelList.get(i).getId().toString();
-                if (modelList.get(i).getStatus() == FileStatus.CREATED || modelList.get(i).getStatus() == FileStatus.UPDATED) {
+                if (modelList.get(i).getStatus() == FileStatus.CREATED_EFD || modelList.get(i).getStatus() == FileStatus.UPDATED) {
                     ArquivoEfdVO arquivoEfdVO = ArquivoEfdVO.builder()
                             .clientCnpj(modelList.get(i).getCnpj())
                             .name("Certacon")
