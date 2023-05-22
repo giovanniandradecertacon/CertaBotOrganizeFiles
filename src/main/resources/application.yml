@@ -18,8 +18,8 @@ spring:
 config:
   downloadPath: /home/selenium/Downloads
   dockerPathDownload: http://192.168.1.84:8068/CertaBotOrganize/downloads/
-  archivedFilesDir: D:\Arquivados\
-  sentFilesDir: D:\Enviados\
+  archivedFilesDir: D:\ARQUIVADOS\
+  sentFilesDir: D:\ENVIADOS\
   rootDir: D:\
   restBuilderNFe: http://192.168.1.84:8061/CertabotNFe
   restBuilderEFDPadrao: http://192.168.1.84:8092/certabot

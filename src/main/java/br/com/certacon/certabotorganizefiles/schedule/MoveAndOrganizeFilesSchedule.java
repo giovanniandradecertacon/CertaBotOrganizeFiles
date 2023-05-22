@@ -36,7 +36,7 @@ public class MoveAndOrganizeFilesSchedule {
         this.filesRepository = filesRepository;
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 1800000, initialDelay = 600000)
     public Boolean moveAndOrganizeScheduled() {
         List<FilesEntity> fileList = filesRepository.findAll();
         if (!fileList.isEmpty()) {
