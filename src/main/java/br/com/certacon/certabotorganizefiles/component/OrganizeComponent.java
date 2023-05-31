@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,9 +36,31 @@ public class OrganizeComponent {
             for (int i = 0; i < filesList.length; i++) {
 
                 if (FileNameUtils.getExtension(filesList[i].getName()).equals("xml")) {
-                    Path xmlFolder = Path.of(filesList[i].getParentFile() + File.separator + "XMLS-" + fileEntity.get().getId().toString().toUpperCase());
-                    if (!xmlFolder.toFile().exists()) xmlFolder.toFile().mkdirs();
-                    Files.move(filesList[i].toPath(), Path.of(xmlFolder + File.separator + filesList[i].getName()), ATOMIC_MOVE);
+                    String filter = helper.readFiles(filesList[i]);
+                    if (filter == null) {
+                        PathCreationEntity pathComponents = helper.pathSplitter(filesList[i]);
+                        Path archivedPath = helper.archivedPathCreator(pathComponents);
+                        helper.moveFile(filesList[i], Path.of(archivedPath + File.separator + filesList[i].getName()), ATOMIC_MOVE);
+                        FilesEntity wrongFile = FilesEntity.builder()
+                                .filePath(archivedPath + File.separator + filesList[i].getName())
+                                .ipServer(fileEntity.get().getIpServer())
+                                .companyName(fileEntity.get().getCompanyName())
+                                .fileName(filesList[i].getName())
+                                .createdAt(new Date())
+                                .cnpj(fileEntity.get().getCnpj())
+                                .status(FileStatus.ERROR)
+                                .build();
+                        filesRepository.save(wrongFile);
+                    } else if (filter.equals("CFe")) {
+                        Path cfeFolder = Path.of(filesList[i].getParentFile() + File.separator + "CFE-" + fileEntity.get().getId().toString().toUpperCase());
+                        if (!cfeFolder.toFile().exists()) cfeFolder.toFile().mkdirs();
+                        Files.move(filesList[i].toPath(), Path.of(cfeFolder + File.separator + filesList[i].getName()), ATOMIC_MOVE);
+                    } else if (filter.equals("NFe")) {
+                        Path nfeFolder = Path.of(filesList[i].getParentFile() + File.separator + "NFE-" + fileEntity.get().getId().toString().toUpperCase());
+                        if (!nfeFolder.toFile().exists()) nfeFolder.toFile().mkdirs();
+                        Files.move(filesList[i].toPath(), Path.of(nfeFolder + File.separator + filesList[i].getName()), ATOMIC_MOVE);
+                    }
+
 
                 } else if (FileNameUtils.getExtension(filesList[i].getName()).equals("txt")) {
                     Path efdFolder = Path.of(filesList[i].getParentFile() + File.separator + "EFDS-" + fileEntity.get().getId().toString().toUpperCase());
