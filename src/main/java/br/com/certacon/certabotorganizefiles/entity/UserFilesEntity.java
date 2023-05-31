@@ -49,12 +49,16 @@ public class UserFilesEntity {
     @Column(name = "caminho")
     @JsonProperty(value = "caminho")
     private String path;
+
     @Column(name = "cnpj")
     private String cnpj;
 
     @Column(name = "ip_servidor")
     private String ipServer;
 
-    @Column(name = "year")
+    @Column(name = "ano")
     private String year;
+
+    @Column(name = "nome_empresa")
+    private String companyName;
 }
