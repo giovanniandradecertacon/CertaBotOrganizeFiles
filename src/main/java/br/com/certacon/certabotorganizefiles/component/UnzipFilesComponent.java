@@ -26,7 +26,7 @@ public class UnzipFilesComponent {
         this.helper = helper;
     }
 
-    public FilesEntity MoveAndUnzip(FilesEntity entity) throws IOException {
+    public FilesEntity moveAndUnzip(FilesEntity entity) throws IOException {
         File zipFile = new File(entity.getFilePath());
         if (zipFile.exists()) {
             PathCreationEntity pathComponents = helper.pathSplitter(zipFile);
@@ -48,8 +48,7 @@ public class UnzipFilesComponent {
                     if (descompactedList.length > 0) {
                         for (int i = 0; i < descompactedList.length; i++) {
                             if (descompactedList[i].isDirectory()) {
-                                FileStatus fileStatus = helper.extractFolder(descompactedList[i], compactedDir);
-                                log.info(fileStatus.name());
+                                helper.extractFolder(descompactedList[i], compactedDir);
                             }
                             if (FileNameUtils.getExtension(descompactedList[i].getName()).equals("zip")
                                     || FileNameUtils.getExtension(descompactedList[i].getName()).equals("rar")) {
@@ -62,9 +61,8 @@ public class UnzipFilesComponent {
                     File[] compactedList = compactedDir.listFiles();
                     if (compactedList.length > 0) {
                         for (int i = 0; i < compactedList.length; i++) {
-                            FileStatus fileStatus = helper.unzipFile(compactedList[i], descompactedDir);
+                            helper.unzipFile(compactedList[i], descompactedDir);
                             Files.deleteIfExists(compactedList[i].toPath());
-                            log.info(fileStatus.name());
                         }
                     }
                     descompactedList = descompactedDir.listFiles();
