@@ -36,4 +36,37 @@ public class SaveFilesForRestComponent {
 
         return userFilesRepository.save(userFilesEntity);
     }
+
+    public UserFilesEntity saveFilesForRestNFe(FilesEntity entity) throws IOException {
+
+        String mimeType = Files.probeContentType(Path.of(entity.getFilePath()));
+        UserFilesEntity userFilesEntity = UserFilesEntity.builder()
+                .companyName(entity.getCompanyName())
+                .fileName(entity.getFileName())
+                .createdAt(new Date())
+                .path(entity.getFilePath())
+                .cnpj(entity.getCnpj())
+                .status(FileStatus.CREATED_NFE)
+                .mimeType(mimeType)
+                .ipServer(entity.getIpServer())
+                .build();
+
+        return userFilesRepository.save(userFilesEntity);
+    }
+
+    public UserFilesEntity saveFilesForRestCFe(FilesEntity entity) throws IOException {
+        String mimeType = Files.probeContentType(Path.of(entity.getFilePath()));
+        UserFilesEntity userFilesEntity = UserFilesEntity.builder()
+                .companyName(entity.getCompanyName())
+                .fileName(entity.getFileName())
+                .createdAt(new Date())
+                .path(entity.getFilePath())
+                .cnpj(entity.getCnpj())
+                .status(FileStatus.CREATED_CFE)
+                .mimeType(mimeType)
+                .ipServer(entity.getIpServer())
+                .build();
+
+        return userFilesRepository.save(userFilesEntity);
+    }
 }
