@@ -40,6 +40,10 @@ public class FilesEntity {
 
     @Column(name = "ip_servidor", nullable = false)
     private String ipServer;
+
+    @Column(name = "nome_empresa")
+    private String companyName;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private FileStatus status;
