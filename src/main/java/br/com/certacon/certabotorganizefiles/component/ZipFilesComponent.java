@@ -41,7 +41,7 @@ public class ZipFilesComponent {
 
                     destiny.add(efdPath.toFile());
 
-                } else if (listFiles[i].getName().startsWith("XMLS-")) {
+                } else if (listFiles[i].getName().startsWith("NFE-")) {
                     PathCreationEntity creationEntity = helper.pathSplitter(directory);
                     File destinyNFe = new File(creationEntity.getRoot() +
                             File.separator + FileFoldersFunction.ORGANIZADOS +
@@ -49,6 +49,18 @@ public class ZipFilesComponent {
                             File.separator + creationEntity.getCnpj() +
                             File.separator + creationEntity.getYear() +
                             File.separator + FileType.NFe);
+                    Path nfePath = helper.zipFiles(listFiles[i], destinyNFe);
+
+                    destiny.add(nfePath.toFile());
+
+                } else if (listFiles[i].getName().startsWith("CFE-")) {
+                    PathCreationEntity creationEntity = helper.pathSplitter(directory);
+                    File destinyNFe = new File(creationEntity.getRoot() +
+                            File.separator + FileFoldersFunction.ORGANIZADOS +
+                            File.separator + creationEntity.getIpServer() +
+                            File.separator + creationEntity.getCnpj() +
+                            File.separator + creationEntity.getYear() +
+                            File.separator + FileType.CFe);
                     Path nfePath = helper.zipFiles(listFiles[i], destinyNFe);
 
                     destiny.add(nfePath.toFile());
@@ -61,34 +73,16 @@ public class ZipFilesComponent {
         }
     }
 
-    public List<File> zipFile(File directory) throws IOException {
-        List<File> destiny = new ArrayList<>();
-        File[] fileList = directory.listFiles();
-        for (int i = 0; i < fileList.length; i++) {
-            if (FileNameUtils.getExtension(fileList[i].toPath()).equals("txt")) {
-                PathCreationEntity creationEntity = helper.pathSplitter(directory);
-                File destinyEfd = new File(creationEntity.getRoot() +
-                        File.separator + FileFoldersFunction.ORGANIZADOS +
-                        File.separator + creationEntity.getIpServer() +
-                        File.separator + creationEntity.getCnpj() +
-                        File.separator + creationEntity.getYear() +
-                        File.separator + FileType.EFDPadrao);
-                Path zippedFile = helper.zipOneFile(fileList[i], destinyEfd);
-                destiny.add(zippedFile.toFile());
-            } else {
-                PathCreationEntity creationEntity = helper.pathSplitter(directory);
-                File destinyNFe = new File(creationEntity.getRoot() +
-                        File.separator + FileFoldersFunction.ORGANIZADOS +
-                        File.separator + creationEntity.getIpServer() +
-                        File.separator + creationEntity.getCnpj() +
-                        File.separator + creationEntity.getYear() +
-                        File.separator + FileType.NFe);
-                Path nfePath = helper.zipOneFile(fileList[i], destinyNFe);
-
-                destiny.add(nfePath.toFile());
-            }
-        }
-        return destiny;
+    public File zipFile(File file, FileType fileType) throws IOException {
+        PathCreationEntity creationEntity = helper.pathSplitter(file);
+        File destinyEfd = new File(creationEntity.getRoot() +
+                File.separator + FileFoldersFunction.ORGANIZADOS +
+                File.separator + creationEntity.getIpServer() +
+                File.separator + creationEntity.getCnpj() +
+                File.separator + creationEntity.getYear() +
+                File.separator + fileType);
+        Path zippedFile = helper.zipOneFile(file, new File(destinyEfd + File.separator + file.getName().replace(FileNameUtils.getExtension(file.getName()), "zip")));
+        return zippedFile.toFile();
     }
 
 }
