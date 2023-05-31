@@ -6,9 +6,7 @@ import br.com.certacon.certabotorganizefiles.utils.FileStatus;
 import br.com.certacon.certabotorganizefiles.utils.FileType;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +45,16 @@ public class MoveFilesHelper {
         return finalPath;
     }
 
+    public Path archivedPathCreator(PathCreationEntity components) {
+        Path finalPath = Path.of(components.getRoot()
+                + File.separator + FileFoldersFunction.ARQUIVADOS
+                + File.separator + components.getIpServer()
+                + File.separator + components.getCnpj()
+                + File.separator + components.getYear()
+        );
+        return finalPath;
+    }
+
     public Path pathCreatorForToOrganize(PathCreationEntity components) {
         Path finalPath = Path.of(components.getRoot()
                 + File.separator + FileFoldersFunction.ORGANIZAR
@@ -69,6 +77,27 @@ public class MoveFilesHelper {
         } catch (IOException e) {
             throw new RuntimeException("Algo deu errado ao mover o arquivo para o destino desejado:" + "\n" + e);
         }
+    }
+
+    public String readFiles(File xmlFile) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(xmlFile));
+        String line = new String();
+        String result = null;
+
+        while ((line = reader.readLine()) != null) {
+            if (line.contains("<NFe")) {
+                reader.close();
+                result = "NFe";
+                break;
+
+            } else if (line.contains("<CFe>")) {
+                reader.close();
+                result = "CFe";
+                break;
+            }
+        }
+        reader.close();
+        return result;
     }
 
 }
