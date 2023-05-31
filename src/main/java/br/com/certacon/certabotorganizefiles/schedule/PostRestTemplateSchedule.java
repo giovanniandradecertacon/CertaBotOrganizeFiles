@@ -3,11 +3,9 @@ package br.com.certacon.certabotorganizefiles.schedule;
 import br.com.certacon.certabotorganizefiles.entity.UserFilesEntity;
 import br.com.certacon.certabotorganizefiles.repository.UserFilesRepository;
 import br.com.certacon.certabotorganizefiles.service.PostRestTemplateEFDPadraoService;
+import br.com.certacon.certabotorganizefiles.service.PostRestTemplateNFeService;
 import br.com.certacon.certabotorganizefiles.utils.FileStatus;
-import br.com.certacon.certabotorganizefiles.vo.ArquivoEfdModelVO;
-import br.com.certacon.certabotorganizefiles.vo.ArquivoEfdVO;
-import br.com.certacon.certabotorganizefiles.vo.ProcessFileModelVO;
-import br.com.certacon.certabotorganizefiles.vo.ProcessFileVO;
+import br.com.certacon.certabotorganizefiles.vo.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -17,6 +15,7 @@ import java.util.List;
 @Service
 public class PostRestTemplateSchedule {
     private final PostRestTemplateEFDPadraoService postRestTemplateEFDPadraoService;
+    private final PostRestTemplateNFeService postRestTemplateNFeService;
     private final UserFilesRepository userFilesRepository;
     @Value("${config.downloadPath}")
     private final String downloadPath;
@@ -30,8 +29,9 @@ public class PostRestTemplateSchedule {
     @Value("${config.senha}")
     private final String senha;
 
-    public PostRestTemplateSchedule(PostRestTemplateEFDPadraoService postRestTemplateEFDPadraoService, UserFilesRepository userFilesRepository, @Value("${config.downloadPath}") String downloadPath, @Value("${config.dockerPathDownload}") String dockerPathDownload, @Value("${config.usuario}") String usuario, @Value("${config.senha}") String senha) {
+    public PostRestTemplateSchedule(PostRestTemplateEFDPadraoService postRestTemplateEFDPadraoService, PostRestTemplateNFeService postRestTemplateNFeService, UserFilesRepository userFilesRepository, @Value("${config.downloadPath}") String downloadPath, @Value("${config.dockerPathDownload}") String dockerPathDownload, @Value("${config.usuario}") String usuario, @Value("${config.senha}") String senha) {
         this.postRestTemplateEFDPadraoService = postRestTemplateEFDPadraoService;
+        this.postRestTemplateNFeService = postRestTemplateNFeService;
         this.userFilesRepository = userFilesRepository;
         this.downloadPath = downloadPath;
         this.dockerPathDownload = dockerPathDownload;
@@ -49,7 +49,7 @@ public class PostRestTemplateSchedule {
                 if (modelList.get(i).getStatus() == FileStatus.CREATED_EFD || modelList.get(i).getStatus() == FileStatus.UPDATED) {
                     ArquivoEfdVO arquivoEfdVO = ArquivoEfdVO.builder()
                             .clientCnpj(modelList.get(i).getCnpj())
-                            .name("Certacon")
+                            .name(modelList.get(i).getCompanyName())
                             .build();
                     ArquivoEfdModelVO result = postRestTemplateEFDPadraoService.enviarArquivoEfd(arquivoEfdVO).getBody();
                     if (result != null) {
@@ -66,6 +66,37 @@ public class PostRestTemplateSchedule {
                         ProcessFileModelVO processResult = postRestTemplateEFDPadraoService.createProcess(processFileVO).getBody();
                         if (processResult != null) {
                             modelList.get(i).setProcessId(processResult.getId());
+                            modelList.get(i).setStatus(FileStatus.UPLOADED);
+                            check = Boolean.TRUE;
+                        } else {
+                            modelList.get(i).setStatus(FileStatus.ERROR);
+                        }
+                    } else {
+                        modelList.get(i).setStatus(FileStatus.ERROR);
+                    }
+                    userFilesRepository.save(modelList.get(i));
+
+                } else if (modelList.get(i).getStatus() == FileStatus.CREATED_NFE || modelList.get(i).getStatus() == FileStatus.UPDATED) {
+                    ArquivoNFeVO arquivoNFeVO = ArquivoNFeVO.builder()
+                            .fileName(modelList.get(i).getFileName())
+                            .build();
+                    NfeFileModelVO nfeFileModelVO = postRestTemplateNFeService.enviarArquivoNFe(arquivoNFeVO).getBody();
+                    if (nfeFileModelVO != null) {
+                        ProcessNfeFileVO fileVO = ProcessNfeFileVO.builder()
+                                .id_arquivo(nfeFileModelVO.getId().toString())
+                                .nome_empresa(modelList.get(i).getCompanyName())
+                                .usuario(usuario)
+                                .senha(senha)
+                                .cnpj(modelList.get(i).getCnpj())
+                                .caminho_de_arquivo(modelList.get(i).getPath())
+                                .caminho_de_destino_download(downloadPath)
+                                .url_de_upload("http://" + modelList.get(i).getIpServer() + "/tributario")
+                                .url_de_download(dockerPathDownload + modelList.get(i).getId().toString())
+                                .nome_arquivo(modelList.get(i).getFileName())
+                                .build();
+                        ProcessFileNFeModelVO result = postRestTemplateNFeService.createProcess(fileVO).getBody();
+                        if (result != null) {
+                            modelList.get(i).setProcessId(result.getId().toString());
                             modelList.get(i).setStatus(FileStatus.UPLOADED);
                             check = Boolean.TRUE;
                         } else {
