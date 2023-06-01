@@ -2,6 +2,7 @@ package br.com.certacon.certabotorganizefiles.schedule;
 
 import br.com.certacon.certabotorganizefiles.entity.UserFilesEntity;
 import br.com.certacon.certabotorganizefiles.repository.UserFilesRepository;
+import br.com.certacon.certabotorganizefiles.service.PostRestTemplateCFeService;
 import br.com.certacon.certabotorganizefiles.service.PostRestTemplateEFDPadraoService;
 import br.com.certacon.certabotorganizefiles.service.PostRestTemplateNFeService;
 import br.com.certacon.certabotorganizefiles.utils.FileStatus;
@@ -15,6 +16,7 @@ import java.util.List;
 @Service
 public class PostRestTemplateSchedule {
     private final PostRestTemplateEFDPadraoService postRestTemplateEFDPadraoService;
+    private final PostRestTemplateCFeService postRestTemplateCFeService;
     private final PostRestTemplateNFeService postRestTemplateNFeService;
     private final UserFilesRepository userFilesRepository;
     @Value("${config.downloadPath}")
@@ -29,8 +31,9 @@ public class PostRestTemplateSchedule {
     @Value("${config.senha}")
     private final String senha;
 
-    public PostRestTemplateSchedule(PostRestTemplateEFDPadraoService postRestTemplateEFDPadraoService, PostRestTemplateNFeService postRestTemplateNFeService, UserFilesRepository userFilesRepository, @Value("${config.downloadPath}") String downloadPath, @Value("${config.dockerPathDownload}") String dockerPathDownload, @Value("${config.usuario}") String usuario, @Value("${config.senha}") String senha) {
+    public PostRestTemplateSchedule(PostRestTemplateEFDPadraoService postRestTemplateEFDPadraoService, PostRestTemplateCFeService postRestTemplateCFeService, PostRestTemplateNFeService postRestTemplateNFeService, UserFilesRepository userFilesRepository, @Value("${config.downloadPath}") String downloadPath, @Value("${config.dockerPathDownload}") String dockerPathDownload, @Value("${config.usuario}") String usuario, @Value("${config.senha}") String senha) {
         this.postRestTemplateEFDPadraoService = postRestTemplateEFDPadraoService;
+        this.postRestTemplateCFeService = postRestTemplateCFeService;
         this.postRestTemplateNFeService = postRestTemplateNFeService;
         this.userFilesRepository = userFilesRepository;
         this.downloadPath = downloadPath;
@@ -95,6 +98,37 @@ public class PostRestTemplateSchedule {
                                 .nome_arquivo(modelList.get(i).getFileName())
                                 .build();
                         ProcessFileNFeModelVO result = postRestTemplateNFeService.createProcess(fileVO).getBody();
+                        if (result != null) {
+                            modelList.get(i).setProcessId(result.getId().toString());
+                            modelList.get(i).setStatus(FileStatus.UPLOADED);
+                            check = Boolean.TRUE;
+                        } else {
+                            modelList.get(i).setStatus(FileStatus.ERROR);
+                        }
+                    } else {
+                        modelList.get(i).setStatus(FileStatus.ERROR);
+                    }
+                    userFilesRepository.save(modelList.get(i));
+                    
+                } else if (modelList.get(i).getStatus() == FileStatus.CREATED_CFE || modelList.get(i).getStatus() == FileStatus.UPDATED) {
+                    ArquivoCFeVO arquivoCFeVO = ArquivoCFeVO.builder()
+                            .fileName(modelList.get(i).getFileName())
+                            .build();
+                    CFeFileModelVO cfeFileModelVO = postRestTemplateCFeService.enviarArquivoCFe(arquivoCFeVO).getBody();
+                    if (cfeFileModelVO != null) {
+                        ProcessCFeFileVO fileVO = ProcessCFeFileVO.builder()
+                                .id_arquivo(cfeFileModelVO.getId().toString())
+                                .nome_empresa(modelList.get(i).getCompanyName())
+                                .usuario(usuario)
+                                .senha(senha)
+                                .cnpj(modelList.get(i).getCnpj())
+                                .caminho_de_arquivo(modelList.get(i).getPath())
+                                .caminho_de_destino_download(downloadPath)
+                                .url_de_upload("http://" + modelList.get(i).getIpServer() + "/tributario")
+                                .url_de_download(dockerPathDownload + modelList.get(i).getId().toString())
+                                .nome_arquivo(modelList.get(i).getFileName())
+                                .build();
+                        ProcessCFeFileModelVO result = postRestTemplateCFeService.createProcess(fileVO).getBody();
                         if (result != null) {
                             modelList.get(i).setProcessId(result.getId().toString());
                             modelList.get(i).setStatus(FileStatus.UPLOADED);
