@@ -29,5 +29,6 @@ config:
   rootDir: D:\
   restBuilderNFe: http://192.168.1.84:8061/CertabotNFe
   restBuilderEFDPadrao: http://192.168.1.84:8092/certabot
+  restBuilderCFe: http://192.168.1.84:8095/CertabotCFe
   usuario: giovanni.andrade@certacon.com.br
   senha: 1
