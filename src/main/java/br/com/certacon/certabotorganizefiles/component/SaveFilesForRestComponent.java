@@ -25,6 +25,7 @@ public class SaveFilesForRestComponent {
 
         String mimeType = Files.probeContentType(Path.of(entity.getFilePath()));
         UserFilesEntity userFilesEntity = UserFilesEntity.builder()
+                .companyName(entity.getCompanyName())
                 .fileName(entity.getFileName())
                 .createdAt(new Date())
                 .path(entity.getFilePath())
