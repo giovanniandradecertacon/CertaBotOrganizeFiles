@@ -12,24 +12,21 @@ import java.util.UUID;
 
 @Service
 public class FilesService {
+
     private final FilesRepository filesRepository;
 
     public FilesService(FilesRepository filesRepository) {
+
         this.filesRepository = filesRepository;
     }
 
     public FilesEntity saveOrUpdate(FilesEntity entity) {
+
         if (validate(entity).equals(Boolean.TRUE)) {
-            Optional<FilesEntity> existingEntity = filesRepository.findByFileName(entity.getFileName());
-            if (existingEntity.isPresent()) {
-                FilesEntity updatedEntity = update(existingEntity.get(), entity);
-                entity.setStatus(FileStatus.UPDATED);
-                return filesRepository.save(updatedEntity);
-            } else {
-                entity.setCreatedAt(new Date());
-                entity.setStatus(FileStatus.CREATED);
-                return filesRepository.save(entity);
-            }
+            entity.setCreatedAt(new Date());
+            entity.setStatus(FileStatus.CREATED);
+            return filesRepository.save(entity);
+
         } else {
             throw new IllegalArgumentException("Nome do arquivo não pode ser nulo ou vazio");
         }
@@ -45,6 +42,7 @@ public class FilesService {
     }
 
     private Boolean validate(FilesEntity entity) {
+
         if (entity.getFileName() == null || entity.getFileName().isEmpty()) {
             return Boolean.FALSE;
         } else {
@@ -53,6 +51,7 @@ public class FilesService {
     }
 
     public Boolean delete(UUID id) throws FileNotFoundException {
+
         Optional<FilesEntity> modelOptional = filesRepository.findById(id);
 
         if (modelOptional.isPresent()) {
@@ -62,4 +61,5 @@ public class FilesService {
             throw new FileNotFoundException("Arquivo não existe");
         }
     }
+
 }

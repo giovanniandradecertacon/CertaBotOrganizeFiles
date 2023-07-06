@@ -25,11 +25,9 @@ public class PostRestTemplateEFDPadraoService {
     public ResponseEntity<ArquivoEfdModelVO> enviarArquivoEfd(ArquivoEfdVO arquivoEfdVO) {
         ResponseEntity<ArquivoEfdModelVO> resposta = null;
         try {
-            // Crie um objeto HttpEntity contendo o objeto ArquivoEfdVO como corpo da solicitação POST
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<ArquivoEfdVO> requestEntity = new HttpEntity<>(arquivoEfdVO, headers);
-            // Faça a solicitação POST e obtenha a resposta como uma instância de ArquivoEfdVO
             resposta = restTemplate.exchange("/arquivo/efd", HttpMethod.POST, requestEntity, ArquivoEfdModelVO.class);
         } catch (RuntimeException e) {
             throw new RuntimeException("Objeto não encontrado");
@@ -43,7 +41,6 @@ public class PostRestTemplateEFDPadraoService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<ProcessFileVO> requestEntity = new HttpEntity<>(processFileVO, headers);
-            // Faça a solicitação POST e obtenha a resposta como uma instância de ArquivoEfdVO
             resposta = restTemplate.exchange("/process/file", HttpMethod.POST, requestEntity, ProcessFileModelVO.class);
         } catch (BadRequestException e) {
             throw new BadRequestException();

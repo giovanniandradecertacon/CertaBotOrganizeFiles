@@ -27,5 +27,4 @@ public class ProcessFileModelVO {
     private String status;
     private String fileName;
     private List<String> processFile;
-
 }

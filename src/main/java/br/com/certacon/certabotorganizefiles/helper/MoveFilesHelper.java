@@ -15,6 +15,7 @@ import java.nio.file.Path;
 public class MoveFilesHelper {
 
     public PathCreationEntity pathSplitter(File folderPath) throws FileNotFoundException {
+
         if (folderPath.exists()) {
             String folderPathReplaced = folderPath.getPath().replace(File.separator, " ");
             String[] folderPathSplitted = folderPathReplaced.split(" ");
@@ -35,7 +36,8 @@ public class MoveFilesHelper {
     }
 
     public Path pathCreatorWithObrigacaoAcessoria(PathCreationEntity components, FileFoldersFunction function, FileType obrigacaoAcessoria) {
-        Path finalPath = Path.of(components.getRoot()
+
+        Path finalPath = Path.of("/tmp"
                 + File.separator + function
                 + File.separator + components.getIpServer()
                 + File.separator + components.getCnpj()
@@ -46,7 +48,8 @@ public class MoveFilesHelper {
     }
 
     public Path archivedPathCreator(PathCreationEntity components) {
-        Path finalPath = Path.of(components.getRoot()
+
+        Path finalPath = Path.of("/tmp"
                 + File.separator + FileFoldersFunction.ARQUIVADOS
                 + File.separator + components.getIpServer()
                 + File.separator + components.getCnpj()
@@ -56,7 +59,8 @@ public class MoveFilesHelper {
     }
 
     public Path pathCreatorForToOrganize(PathCreationEntity components) {
-        Path finalPath = Path.of(components.getRoot()
+
+        Path finalPath = Path.of("/tmp"
                 + File.separator + FileFoldersFunction.ORGANIZAR
                 + File.separator + components.getIpServer()
                 + File.separator + components.getCnpj()
@@ -66,8 +70,9 @@ public class MoveFilesHelper {
     }
 
     public FileStatus moveFile(File fileToMove, Path destinyPath, CopyOption copyOption) {
+
         try {
-            if (fileToMove.exists()) {
+            if (fileToMove.exists() && fileToMove.isFile()) {
                 Files.move(fileToMove.toPath(), destinyPath, copyOption);
                 return FileStatus.MOVED;
             } else {
@@ -80,6 +85,7 @@ public class MoveFilesHelper {
     }
 
     public String readFiles(File xmlFile) throws IOException {
+
         BufferedReader reader = new BufferedReader(new FileReader(xmlFile));
         String line = new String();
         String result = null;

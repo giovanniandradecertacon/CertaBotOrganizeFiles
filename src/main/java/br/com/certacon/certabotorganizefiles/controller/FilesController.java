@@ -4,6 +4,8 @@ package br.com.certacon.certabotorganizefiles.controller;
 import br.com.certacon.certabotorganizefiles.entity.FilesEntity;
 import br.com.certacon.certabotorganizefiles.exception.MessageExceptionHandler;
 import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
+import br.com.certacon.certabotorganizefiles.schedule.PostRestTemplateSchedule;
+import br.com.certacon.certabotorganizefiles.schedule.ProcessForRestSchedule;
 import br.com.certacon.certabotorganizefiles.service.FilesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,12 +23,17 @@ import java.util.UUID;
 @RestController
 @RequestMapping("files")
 public class FilesController {
-    private final FilesService filesService;
 
+    private final FilesService filesService;
+    private final ProcessForRestSchedule processForRestSchedule;
+    private final PostRestTemplateSchedule postRestTemplateSchedule;
     private final FilesRepository filesRepository;
 
-    public FilesController(FilesService filesService, FilesRepository filesRepository) {
+    public FilesController(FilesService filesService, ProcessForRestSchedule processForRestSchedule, PostRestTemplateSchedule postRestTemplateSchedule, FilesRepository filesRepository) {
+
         this.filesService = filesService;
+        this.processForRestSchedule = processForRestSchedule;
+        this.postRestTemplateSchedule = postRestTemplateSchedule;
         this.filesRepository = filesRepository;
     }
 
@@ -42,8 +49,9 @@ public class FilesController {
                     schema = @Schema(implementation = MessageExceptionHandler.class))})
     })
     public ResponseEntity<FilesEntity> create(@RequestBody FilesEntity entity) {
-        FilesEntity bot = filesService.saveOrUpdate(entity);
-        return ResponseEntity.status(HttpStatus.OK).body(bot);
+
+        FilesEntity create = filesService.saveOrUpdate(entity);
+        return ResponseEntity.status(HttpStatus.OK).body(create);
     }
 
 
@@ -61,6 +69,7 @@ public class FilesController {
                     schema = @Schema(implementation = MessageExceptionHandler.class))})
     })
     public ResponseEntity<List<FilesEntity>> getAll() {
+
         try {
             List<FilesEntity> botList = filesRepository.findAll();
             return ResponseEntity.status(HttpStatus.OK).body(botList);
@@ -83,6 +92,7 @@ public class FilesController {
                     schema = @Schema(implementation = MessageExceptionHandler.class))})
     })
     public ResponseEntity<FilesEntity> update(@RequestBody FilesEntity entity) throws Exception {
+
         FilesEntity response = filesService.saveOrUpdate(entity);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -100,6 +110,7 @@ public class FilesController {
                     schema = @Schema(implementation = MessageExceptionHandler.class))})
     })
     public ResponseEntity delete(@PathVariable(value = "id") UUID id) throws FileNotFoundException {
+
         boolean entity = filesService.delete(id);
         if (entity == Boolean.FALSE) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Arquivo não foi encontrado!");

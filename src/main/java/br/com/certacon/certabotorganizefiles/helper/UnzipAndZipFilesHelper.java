@@ -56,36 +56,43 @@ public class UnzipAndZipFilesHelper {
 
 
     public FileStatus unzipFile(File zipFile, File destinyDirectory) {
+        FileStatus status = null;
         try (ArchiveInputStream entrada = new ZipArchiveInputStream(new FileInputStream(zipFile))) {
             if (!destinyDirectory.exists()) {
                 destinyDirectory.mkdirs();
             }
 
-            ArchiveEntry entry = entrada.getNextEntry();
+            if (zipFile.exists()) {
+                ArchiveEntry entry = entrada.getNextEntry();
 
-            while (entry != null) {
-                String nomeArquivo = entry.getName();
-                File arquivo = new File(destinyDirectory, nomeArquivo);
+                while (entry != null) {
+                    String nomeArquivo = entry.getName();
+                    File arquivo = new File(destinyDirectory, nomeArquivo);
 
-                if (entry.isDirectory()) {
-                    arquivo.mkdirs();
-                } else {
-                    File pastaArquivo = arquivo.getParentFile();
-                    if (!pastaArquivo.exists()) {
-                        pastaArquivo.mkdirs();
+                    if (entry.isDirectory()) {
+                        arquivo.mkdirs();
+                    } else {
+                        File pastaArquivo = arquivo.getParentFile();
+                        if (!pastaArquivo.exists()) {
+                            pastaArquivo.mkdirs();
+                        }
+                        FileOutputStream fos = new FileOutputStream(arquivo);
+                        IOUtils.copy(entrada, fos);
+                        fos.close();
                     }
-                    FileOutputStream fos = new FileOutputStream(arquivo);
-                    IOUtils.copy(entrada, fos);
-                    fos.close();
+
+                    entry = entrada.getNextEntry();
                 }
-
-                entry = entrada.getNextEntry();
+                status = FileStatus.UNZIPPED;
+            } else {
+                status = FileStatus.PROCESSING;
             }
-            return FileStatus.UNZIPPED;
         } catch (IOException e) {
+            status = FileStatus.PROCESSING;
             throw new RuntimeException(e);
+        } finally {
+            return status;
         }
-
     }
 
     public PathCreationEntity pathSplitter(File folderPath) throws FileNotFoundException {

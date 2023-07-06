@@ -2,7 +2,6 @@ package br.com.certacon.certabotorganizefiles.schedule;
 
 import br.com.certacon.certabotorganizefiles.component.*;
 import br.com.certacon.certabotorganizefiles.entity.FilesEntity;
-import br.com.certacon.certabotorganizefiles.helper.MoveFilesHelper;
 import br.com.certacon.certabotorganizefiles.repository.FilesRepository;
 import br.com.certacon.certabotorganizefiles.utils.FileStatus;
 import br.com.certacon.certabotorganizefiles.utils.FileType;
@@ -19,7 +18,7 @@ import java.util.List;
 
 @Service
 public class ProcessForRestSchedule {
-    private final MoveFilesHelper helper;
+
     private final DirectoryManipulatorComponent directoryManipulatorComponent;
     private final MoveFilesComponent moveFilesComponent;
     private final UnzipFilesComponent unzipFilesComponent;
@@ -29,8 +28,8 @@ public class ProcessForRestSchedule {
 
     private final FilesRepository filesRepository;
 
-    public ProcessForRestSchedule(MoveFilesHelper helper, DirectoryManipulatorComponent directoryManipulatorComponent, MoveFilesComponent moveFilesComponent, UnzipFilesComponent unzipFilesComponent, OrganizeComponent organizeComponent, ZipFilesComponent zipFilesComponent, SaveFilesForRestComponent saveFilesForRestComponent, FilesRepository filesRepository) {
-        this.helper = helper;
+    public ProcessForRestSchedule(DirectoryManipulatorComponent directoryManipulatorComponent, MoveFilesComponent moveFilesComponent, UnzipFilesComponent unzipFilesComponent, OrganizeComponent organizeComponent, ZipFilesComponent zipFilesComponent, SaveFilesForRestComponent saveFilesForRestComponent, FilesRepository filesRepository) {
+
         this.directoryManipulatorComponent = directoryManipulatorComponent;
         this.moveFilesComponent = moveFilesComponent;
         this.unzipFilesComponent = unzipFilesComponent;
@@ -42,6 +41,7 @@ public class ProcessForRestSchedule {
 
     @Scheduled(fixedRate = 1000, initialDelay = 1000)
     public void processFilesAndPrepareForBots() {
+
         List<FilesEntity> fileList = filesRepository.findAllByStatusEquals(FileStatus.CREATED);
         fileList.forEach(file -> {
             try {
@@ -49,7 +49,6 @@ public class ProcessForRestSchedule {
                 file.setStatus(FileStatus.CREATED);
 
             } catch (FileNotFoundException e) {
-                file.setStatus(FileStatus.ERROR);
                 throw new RuntimeException(e);
             } finally {
                 filesRepository.save(file);
@@ -63,7 +62,6 @@ public class ProcessForRestSchedule {
                 try {
                     movedFile = unzipFilesComponent.moveAndUnzip(movedFile);
                 } catch (IOException e) {
-                    movedFile.setStatus(FileStatus.ERROR);
                     throw new RuntimeException(e);
                 } finally {
                     filesRepository.save(movedFile);
@@ -153,7 +151,7 @@ public class ProcessForRestSchedule {
 
         });
 
-        List<FilesEntity> zippedFiles = filesRepository.findAllByStatusEquals(FileStatus.READY);
+        List<FilesEntity> zippedFiles = filesRepository.findAllByStatusEquals(FileStatus.ZIPPED);
         zippedFiles.forEach(zippedFile -> {
             File zipped = new File(zippedFile.getFilePath());
             try {
@@ -174,7 +172,7 @@ public class ProcessForRestSchedule {
             } finally {
                 filesRepository.save(zippedFile);
             }
-
         });
     }
+
 }

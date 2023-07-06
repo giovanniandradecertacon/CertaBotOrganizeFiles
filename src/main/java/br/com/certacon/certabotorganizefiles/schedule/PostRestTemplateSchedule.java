@@ -15,6 +15,7 @@ import java.util.List;
 
 @Service
 public class PostRestTemplateSchedule {
+
     private final PostRestTemplateEFDPadraoService postRestTemplateEFDPadraoService;
     private final PostRestTemplateCFeService postRestTemplateCFeService;
     private final PostRestTemplateNFeService postRestTemplateNFeService;
@@ -32,6 +33,7 @@ public class PostRestTemplateSchedule {
     private final String senha;
 
     public PostRestTemplateSchedule(PostRestTemplateEFDPadraoService postRestTemplateEFDPadraoService, PostRestTemplateCFeService postRestTemplateCFeService, PostRestTemplateNFeService postRestTemplateNFeService, UserFilesRepository userFilesRepository, @Value("${config.downloadPath}") String downloadPath, @Value("${config.dockerPathDownload}") String dockerPathDownload, @Value("${config.usuario}") String usuario, @Value("${config.senha}") String senha) {
+
         this.postRestTemplateEFDPadraoService = postRestTemplateEFDPadraoService;
         this.postRestTemplateCFeService = postRestTemplateCFeService;
         this.postRestTemplateNFeService = postRestTemplateNFeService;
@@ -44,6 +46,7 @@ public class PostRestTemplateSchedule {
 
     @Scheduled(fixedRate = 30000, initialDelay = 45000)
     public boolean postRest() {
+
         List<UserFilesEntity> modelList = userFilesRepository.findAll();
         boolean check = Boolean.FALSE;
         if (modelList.size() > 0) {
@@ -109,7 +112,7 @@ public class PostRestTemplateSchedule {
                         modelList.get(i).setStatus(FileStatus.ERROR);
                     }
                     userFilesRepository.save(modelList.get(i));
-                    
+
                 } else if (modelList.get(i).getStatus() == FileStatus.CREATED_CFE || modelList.get(i).getStatus() == FileStatus.UPDATED) {
                     ArquivoCFeVO arquivoCFeVO = ArquivoCFeVO.builder()
                             .fileName(modelList.get(i).getFileName())
@@ -145,4 +148,5 @@ public class PostRestTemplateSchedule {
         }
         return check;
     }
+
 }

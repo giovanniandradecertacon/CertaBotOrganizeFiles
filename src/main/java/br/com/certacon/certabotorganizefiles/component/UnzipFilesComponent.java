@@ -37,8 +37,15 @@ public class UnzipFilesComponent {
             File descompactedDir = paths.get(1).toFile();
 
             Path destPath = Files.move(zipFile.toPath(), Path.of(compactedDir.toPath() + File.separator + zipFile.getName()), ATOMIC_MOVE);
+            FileStatus status = null;
 
-            FileStatus status = helper.unzipFile(destPath.toFile(), descompactedDir);
+
+            do {
+                status = helper.unzipFile(destPath.toFile(), descompactedDir);
+
+            } while (status == FileStatus.PROCESSING);
+
+
             Files.deleteIfExists(destPath);
 
             if (status.equals(FileStatus.UNZIPPED)) {
